@@ -1,0 +1,17 @@
+{
+    "domain": "xiaomi_viomi",
+    "name": "Xiaomi Viomi Vaccum",
+    "version": "0.0.2",
+    "config_flow": true,
+    "documentation": "https://github.com/nergal/homeassistant-vacuum-viomi",
+    "issue_tracker": "https://github.com/nergal/homeassistant-vacuum-viomi/issues",
+    "requirements": [
+        "construct==2.10.67",
+        "python-miio==0.5.6"
+    ],
+    "iot_class": "local_polling",
+    "dependencies": [],
+    "codeowners": [
+        "@nergal"
+    ]
+}

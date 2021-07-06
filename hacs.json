@@ -1,0 +1,6 @@
+{
+    "name": "Xiaomi Viomi Vaccum",
+    "domains": ["vacuum"],
+    "homeassistant": "2021.6.6",
+    "render_readme": true
+}
