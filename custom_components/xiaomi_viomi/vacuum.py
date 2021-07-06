@@ -219,7 +219,7 @@ class ViomiVacuumIntegration(XiaomiMiioEntity, StateVacuumEntity):
 
     def _got_error(self):
         error_code = self.vacuum_state.error_code
-        return error_code and error_code not in ERRORS_FALSE_POSITIVE:
+        return error_code and error_code not in ERRORS_FALSE_POSITIVE
 
     def _get_status(self):
         return STATE_CODE_TO_STATE[int(self.vacuum_state.state.value)]
