@@ -2,14 +2,12 @@
   "config": {
     "abort": {
       "reauth_successful": "[%key:common::config_flow::abort::reauth_successful%]",
-      "incomplete_info": "Incomplete information to setup device, no host or token supplied."
-    },
-    "error": {
+      "incomplete_info": "Incomplete information to setup device, no host or token supplied.",
       "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]"
     },
-    "flow_title": "{name}",
+    "flow_title": "{name} asd",
     "step": {
-      "user": {
+      "manual": {
         "data": {
           "host": "[%key:common::config_flow::data::host%]",
           "token": "[%key:common::config_flow::data::api_token%]"

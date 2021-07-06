@@ -12,10 +12,10 @@ from .const import CONF_MODEL, CONF_MAC, DOMAIN, MODELS_VACUUM
 
 _LOGGER = logging.getLogger(__name__)
 
-DEVICE_SETTINGS = {
+DEVICE_CONFIG = {
+    vol.Required(CONF_HOST): str,
     vol.Required(CONF_TOKEN): vol.All(str, vol.Length(min=32, max=32)),
 }
-DEVICE_CONFIG = vol.Schema({vol.Required(CONF_HOST): str}).extend(DEVICE_SETTINGS)
 DEVICE_MODEL_CONFIG = vol.Schema({vol.Required(CONF_MODEL): vol.In(MODELS_VACUUM)})
 
 
@@ -71,6 +71,8 @@ class ConnectViomiDevice:
 class XiaomiViomiFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore
     """Handle a Xiaomi Viomi config flow."""
 
+    VERSION = 1
+
     def __init__(self):
         """Set initial values for config flow."""
         self.name = None
@@ -80,6 +82,10 @@ class XiaomiViomiFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type:
         self.model = None
 
     async def async_step_user(self, user_input=None):
+        """Handle a flow initialized by the user."""
+        return await self.async_step_manual(user_input)
+
+    async def async_step_manual(self, user_input=None):
         """First step is getting user input configuration params."""
         errors = {}
         if user_input is not None:
@@ -98,9 +104,7 @@ class XiaomiViomiFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type:
 
             if self.model is None:
                 errors["base"] = "cannot_connect"
-                return self.async_show_form(
-                    step_id="connect", data_schema=DEVICE_MODEL_CONFIG, errors=errors
-                )
+                return self.async_abort(reason="cannot_connect")
 
             if self.mac is None and device_info is not None:
                 self.mac = format_mac(device_info.mac_address)
@@ -132,5 +136,5 @@ class XiaomiViomiFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type:
             )
 
         return self.async_show_form(
-            step_id="user", data_schema=DEVICE_CONFIG, errors=errors
+            step_id="manual", data_schema=DEVICE_CONFIG, errors=errors
         )
