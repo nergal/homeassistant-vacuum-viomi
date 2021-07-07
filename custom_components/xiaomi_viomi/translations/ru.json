@@ -15,7 +15,7 @@
           "host": "IP-адрес",
           "token": "Токен API"
         },
-        "description": "Для подключения требуется 32-х значный Токен API. О том, как получить токен, Вы можете узнать здесь:\\nhttps://www.home-assistant.io/integrations/xiaomi_miio#retrieving-the-access-token.\\nОбратите внимание, что этот токен отличается от ключа, используемого при интеграции Xiaomi Aqara.",
+        "description": "Для подключения требуется 32-х значный Токен API. О том, как получить токен, Вы можете узнать здесь:\nhttps://www.home-assistant.io/integrations/xiaomi_miio#retrieving-the-access-token.\nОбратите внимание, что этот токен отличается от ключа, используемого при интеграции Xiaomi Aqara.",
         "title": "Подключение к устройству Xiaomi Viomi"
       }
     }

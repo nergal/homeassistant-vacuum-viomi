@@ -43,7 +43,7 @@ class ViomiDeviceHub:
         """Return the class containing device info."""
         return self._device_info
 
-    async def async_device_is_connectable(self, host: str, token: str):
+    async def async_device_is_connectable(self, host: str, token: str) -> bool:
         """Connect to the Xiaomi Device."""
         _LOGGER.debug("Initializing with host %s (token %s...)", host, token[:5])
 
@@ -62,24 +62,19 @@ class ViomiDeviceHub:
             )
             return False
 
-        _LOGGER.debug(
-            "%s %s %s detected",
-            self._device_info.model,
-            self._device_info.firmware_version,
-            self._device_info.hardware_version,
-        )
+        _LOGGER.debug("%s detected", self._device_info.model)
         return True
 
 
 async def validate_input(hass: HomeAssistant, data: Dict[str, Any]) -> Dict[str, Any]:
     hub = ViomiDeviceHub(hass)
 
-    if not await hub.async_device_is_connectable(data["username"], data["password"]):
+    if not await hub.async_device_is_connectable(data[CONF_HOST], data[CONF_TOKEN]):
         raise InvalidAuth
 
     return {
-        CONF_HOST: data["host"],
-        CONF_TOKEN: data["token"],
+        CONF_HOST: data[CONF_HOST],
+        CONF_TOKEN: data[CONF_TOKEN],
         CONF_MODEL: hub.device_info.model,
         CONF_MAC: format_mac(hub.device_info.mac_address),
     }
@@ -104,11 +99,25 @@ class XiaomiViomiFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type:
             errors["base"] = "cannot_connect"
         except (InvalidAuth, ConfigEntryAuthFailed):
             errors["base"] = "invalid_auth"
-        except Exception as e:  # pylint: disable=broad-except
-            _LOGGER.exception("Unexpected exception", e)
+        except Exception:  # pylint: disable=broad-except
+            _LOGGER.exception("Unexpected exception")
             errors["base"] = "unknown"
         else:
-            return self.async_create_entry(title=info["model"], data=info)
+            unique_id = info[CONF_MAC]
+            existing_entry = await self.async_set_unique_id(
+                unique_id, raise_on_progress=False
+            )
+
+            if existing_entry:
+                data = existing_entry.data.copy()
+                data[CONF_HOST] = info[CONF_HOST]
+                data[CONF_TOKEN] = info[CONF_TOKEN]
+
+                self.hass.config_entries.async_update_entry(existing_entry, data=data)
+                await self.hass.config_entries.async_reload(existing_entry.entry_id)
+                return self.async_abort(reason="already_configured")
+
+            return self.async_create_entry(title=info[CONF_MODEL], data=info)
 
         return self.async_show_form(
             step_id="user", data_schema=DEVICE_CONFIG, errors=errors

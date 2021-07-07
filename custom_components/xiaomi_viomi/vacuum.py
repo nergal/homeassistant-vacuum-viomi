@@ -3,6 +3,7 @@ import logging
 from functools import partial
 from miio import DeviceException, ViomiVacuum
 from miio.viomivacuum import ViomiVacuumStatus, ViomiVacuumSpeed
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_TOKEN, STATE_OFF, STATE_ON
 from homeassistant.components.xiaomi_miio.device import XiaomiMiioEntity
 from homeassistant.components.vacuum import (
@@ -25,7 +26,7 @@ from homeassistant.components.vacuum import (
 from homeassistant.util.dt import as_utc
 
 
-from .const import DEVICE_PROPERTIES
+from .const import DEVICE_PROPERTIES, CONF_MODEL, CONF_MAC
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -72,7 +73,7 @@ ERRORS_FALSE_POSITIVE = (
 )
 
 
-async def async_setup_entry(hass, config_entry, async_add_entities):
+async def async_setup_entry(hass, config_entry: ConfigEntry, async_add_entities):
     """Set up the Xiaomi Viomi vacuum cleaner robot from a config entry."""
     entities = []
 
@@ -196,7 +197,7 @@ class ViomiVacuumIntegration(XiaomiMiioEntity, StateVacuumEntity):
                         / 3600
                     ),
                     ATTR_FILTER_LEFT: int(
-                        (self.consumable_state.filter_left).total_seconds() / 3600
+                        self.consumable_state.filter_left.total_seconds() / 3600
                     ),
                     ATTR_STATUS: str(self._get_status()),
                     ATTR_MOP_ATTACHED: self.vacuum_state.mop_installed,
