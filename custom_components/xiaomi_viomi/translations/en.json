@@ -1,13 +1,16 @@
 {
   "config": {
     "abort": {
-      "reauth_successful": "Re-authentication was successful",
-      "incomplete_info": "Incomplete information to setup device, no host or token supplied.",
-      "cannot_connect": "Failed to connect"
+      "already_configured": "The device is already configured"
+    },
+    "error": {
+      "invalid_auth": "Incomplete information to setup device, no host or token supplied",
+      "cannot_connect": "Failed to connect",
+      "unknown": "Unknown error occurred"
     },
     "flow_title": "{name}",
     "step": {
-      "manual": {
+      "user": {
         "data": {
           "host": "IP Address",
           "token": "API Token"
