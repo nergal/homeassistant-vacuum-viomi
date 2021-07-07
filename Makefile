@@ -1,24 +1,26 @@
 POETRY=poetry
-INTEGRATION_FOLDER=custom_components/xiaomi_viomi
+INTEGRATION_FOLDER=custom_components
 TEST_FOLDER=tests/
 
+ALL_FOLDERS = $(INTEGRATION_FOLDER) $(TEST_FOLDER)
+
 lint: black mypy flake
-lintfix: isort   blackfix lint
+lintfix: isort blackfix lint
 
 mypy:
-	$(POETRY) run mypy --ignore-missing-imports $(INTEGRATION_FOLDER)
+	$(POETRY) run mypy --ignore-missing-imports $(ALL_FOLDERS)
 
 flake:
-	$(POETRY) run flake8 $(INTEGRATION_FOLDER)
+	$(POETRY) run flake8 $(ALL_FOLDERS)
 
 black:
-	$(POETRY) run black --check $(INTEGRATION_FOLDER)
+	$(POETRY) run black --check $(ALL_FOLDERS)
 
 blackfix:
-	$(POETRY) run black $(INTEGRATION_FOLDER)
+	$(POETRY) run black $(ALL_FOLDERS)
 
 isort:
-	$(POETRY) run isort --atomic $(INTEGRATION_FOLDER)
+	$(POETRY) run isort --atomic $(ALL_FOLDERS)
 
 test:
 	$(POETRY) run pytest $(TEST_FOLDER)
