@@ -1,18 +1,19 @@
 """Config flow to configure Xiaomi Viomi."""
 import logging
 from typing import Any, Dict, Optional
+
 import voluptuous as vol
 from construct.core import ChecksumError
+from homeassistant import config_entries
+from homeassistant.const import CONF_HOST, CONF_TOKEN
+from homeassistant.core import HomeAssistant
+from homeassistant.data_entry_flow import FlowResult
+from homeassistant.exceptions import ConfigEntryAuthFailed, HomeAssistantError
+from homeassistant.helpers.device_registry import format_mac
 from miio import DeviceException, ViomiVacuum
 from miio.device import DeviceInfo
-from homeassistant import config_entries
-from homeassistant.core import HomeAssistant
-from homeassistant.const import CONF_HOST, CONF_TOKEN
-from homeassistant.exceptions import ConfigEntryAuthFailed, HomeAssistantError
-from homeassistant.data_entry_flow import FlowResult
-from homeassistant.helpers.device_registry import format_mac
 
-from .const import CONF_MODEL, CONF_MAC, DOMAIN
+from .const import CONF_MAC, CONF_MODEL, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 

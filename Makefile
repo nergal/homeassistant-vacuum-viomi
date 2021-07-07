@@ -3,7 +3,7 @@ INTEGRATION_FOLDER=custom_components/xiaomi_viomi
 TEST_FOLDER=tests/
 
 lint: black mypy flake
-lintfix: blackfix lint
+lintfix: isort   blackfix lint
 
 mypy:
 	$(POETRY) run mypy --ignore-missing-imports $(INTEGRATION_FOLDER)
@@ -16,6 +16,9 @@ black:
 
 blackfix:
 	$(POETRY) run black $(INTEGRATION_FOLDER)
+
+isort:
+	$(POETRY) run isort --atomic $(INTEGRATION_FOLDER)
 
 test:
 	$(POETRY) run pytest $(TEST_FOLDER)

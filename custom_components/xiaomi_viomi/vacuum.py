@@ -1,33 +1,32 @@
 """Xiaomi Viomi integration."""
 import logging
 from functools import partial
-from miio import DeviceException, ViomiVacuum
-from miio.viomivacuum import ViomiVacuumStatus, ViomiVacuumSpeed
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_HOST, CONF_TOKEN, STATE_OFF, STATE_ON
-from homeassistant.components.xiaomi_miio.device import XiaomiMiioEntity
+
 from homeassistant.components.vacuum import (
     ATTR_CLEANED_AREA,
     STATE_CLEANING,
     STATE_DOCKED,
-    STATE_IDLE,
     STATE_ERROR,
+    STATE_IDLE,
     STATE_RETURNING,
-    SUPPORT_STATE,
-    SUPPORT_PAUSE,
-    SUPPORT_STOP,
-    SUPPORT_RETURN_HOME,
-    SUPPORT_FAN_SPEED,
-    SUPPORT_SEND_COMMAND,
     SUPPORT_BATTERY,
+    SUPPORT_FAN_SPEED,
+    SUPPORT_PAUSE,
+    SUPPORT_RETURN_HOME,
+    SUPPORT_SEND_COMMAND,
     SUPPORT_START,
+    SUPPORT_STATE,
+    SUPPORT_STOP,
     StateVacuumEntity,
 )
+from homeassistant.components.xiaomi_miio.device import XiaomiMiioEntity
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_HOST, CONF_TOKEN, STATE_OFF, STATE_ON
 from homeassistant.util.dt import as_utc
+from miio import DeviceException, ViomiVacuum
+from miio.viomivacuum import ViomiVacuumSpeed, ViomiVacuumStatus
 
-
-from .const import DEVICE_PROPERTIES, CONF_MODEL, CONF_MAC
-
+from .const import DEVICE_PROPERTIES
 
 _LOGGER = logging.getLogger(__name__)
 
