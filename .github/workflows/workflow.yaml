@@ -1,8 +1,15 @@
 name: Validation flow
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
-  lint:
+  ci:
+    name: Static code checks
     strategy:
       fail-fast: false
       matrix:
@@ -22,6 +29,8 @@ jobs:
         run: poetry install
       - name: Run lint checks
         run: make lint
+      - name: Run unit tests
+        run: make test
 
   analyze:
     name: Analyze CodeQL
@@ -49,13 +58,15 @@ jobs:
       uses: github/codeql-action/analyze@v1
 
   validateHassfest:
-    needs: [lint, analyze]
+    name: Validate againts HASSFest
+    needs: [ci, analyze]
     runs-on: "ubuntu-latest"
     steps:
       - uses: "actions/checkout@v2"
       - uses: home-assistant/actions/hassfest@master
 
   validateHACS:
+    name: Validate against HACS
     needs: [validateHassfest]
     runs-on: "ubuntu-latest"
     continue-on-error: true # @TODO remove before release
