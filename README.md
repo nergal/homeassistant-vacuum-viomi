@@ -1,4 +1,4 @@
-# homeassistant-vacuum-viomi
+# Homeassistant Vacuum Viomi integration for HACS
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -30,7 +30,7 @@ vacuum:
 | Model | Device ID | Aliases | Status |
 | ----- | --------- | ------- | ------ |
 | **STYJ02YM** | viomi.vacuum.v8 | Mi Robot Vacuum-Mop P <br> MiJia Mi Robot Vacuum Cleaner <br> Xiaomi Mijia Robot Vacuum Cleaner LDS | :white_check_mark: Verified |
-| **STYJ02YM** | viomi.vacuum.v7 | Mi Robot Vacuum-Mop P (CN) | :warning: Not tested |
+| **STY02YM** | viomi.vacuum.v7 | Mi Robot Vacuum-Mop P (CN) | :warning: Not tested |
 | **V-RVCLM21B** | viomi.vacuum.v6 | Viomi V2 <br> Xiaomi Viomi Cleaning Robot <br> Viomi Cleaning Robot V2 Pro | :warning: Not tested |
 
 ## Disclaimer
