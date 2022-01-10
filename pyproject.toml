@@ -1,16 +1,16 @@
 [tool.poetry]
 name = "homeassistant-vacuum-viomi"
-version = "0.0.2"
+version = "0.0.3"
 description = "Integration of a Xiaomi Viomi vacuum devices"
 authors = ["Artem Poliukhovych <me@2mio.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-python-miio = "^0.5.6"
+python-miio = "^0.5.9"
 voluptuous = "^0.12.1"
 construct = "^2.10.67"
-homeassistant = "^2021.6.6"
+homeassistant = "^2021.12.8"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3.9.2"
@@ -19,8 +19,8 @@ mypy = "^0.910"
 pytest-cov = "^2.12.1"
 black = "^21.6b0"
 isort = "^5.9.1"
-pytest-homeassistant-custom-component = "^0.4.2"
-micloud = "^0.3"
+pytest-homeassistant-custom-component = "^0.5.12"
+micloud = "^0.5"
 
 [build-system]
 requires = ["poetry>=0.12"]
