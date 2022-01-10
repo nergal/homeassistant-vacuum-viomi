@@ -230,7 +230,7 @@ class ViomiVacuumIntegration(XiaomiMiioEntity, StateVacuumEntity):
             state = self._get_device_status()
             self.vacuum_state = state
 
-            self._fan_speeds = state.fan_speed_presets()
+            self._fan_speeds = {x.name: x.value for x in list(ViomiVacuumSpeed)}
             self._fan_speeds_reverse = {v: k for k, v in self._fan_speeds.items()}
 
             self.consumable_state = self._device.consumable_status()
