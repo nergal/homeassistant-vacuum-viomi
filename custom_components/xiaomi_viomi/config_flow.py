@@ -10,8 +10,9 @@ from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import ConfigEntryAuthFailed, HomeAssistantError
 from homeassistant.helpers.device_registry import format_mac
-from miio import DeviceException, ViomiVacuum
+from miio import DeviceException
 from miio.device import DeviceInfo
+from miio.integrations.vacuum.viomi.viomivacuum import ViomiVacuum
 
 from .const import CONF_MAC, CONF_MODEL, DOMAIN
 
@@ -53,6 +54,9 @@ class ViomiDeviceHub:
             self._device_info = await self._hass.async_add_executor_job(
                 self._device.info
             )
+
+            if self._device_info:
+                _LOGGER.debug("%s detected", self._device_info.model)
         except DeviceException as error:
             if isinstance(error.__cause__, ChecksumError):
                 raise ConfigEntryAuthFailed(error) from error
@@ -63,7 +67,6 @@ class ViomiDeviceHub:
             )
             return False
 
-        _LOGGER.debug("%s detected", self._device_info.model)
         return True
 
 

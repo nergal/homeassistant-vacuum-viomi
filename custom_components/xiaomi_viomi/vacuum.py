@@ -22,9 +22,12 @@ from homeassistant.components.vacuum import (
 from homeassistant.components.xiaomi_miio.device import XiaomiMiioEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_TOKEN, STATE_OFF, STATE_ON
-from homeassistant.util.dt import as_utc
-from miio import DeviceException, ViomiVacuum
-from miio.viomivacuum import ViomiVacuumSpeed, ViomiVacuumStatus
+from miio import DeviceException
+from miio.integrations.vacuum.viomi.viomivacuum import (
+    ViomiVacuum,
+    ViomiVacuumSpeed,
+    ViomiVacuumStatus,
+)
 
 from .const import DEVICE_PROPERTIES
 
@@ -152,18 +155,6 @@ class ViomiVacuumIntegration(XiaomiMiioEntity, StateVacuumEntity):
     def fan_speed_list(self):
         """Get the list of available fan speed steps of the vacuum cleaner."""
         return list(self._fan_speeds) if self._fan_speeds else []
-
-    @property
-    def timers(self):
-        """Get the list of added timers of the vacuum cleaner."""
-        return [
-            {
-                "enabled": timer.enabled,
-                "cron": timer.cron,
-                "next_schedule": as_utc(timer.next_schedule),
-            }
-            for timer in self._timers
-        ]
 
     @property
     def extra_state_attributes(self):

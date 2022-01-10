@@ -1,6 +1,7 @@
 .mypy_cache/
 .pytest_cache/
 .vscode/
+__pycache__/
 .idea/
 *.tmp
 *.log
