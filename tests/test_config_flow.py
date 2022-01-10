@@ -4,11 +4,9 @@ from unittest.mock import PropertyMock, patch
 
 from homeassistant import config_entries, setup
 from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import (RESULT_TYPE_CREATE_ENTRY,
-                                           RESULT_TYPE_FORM)
+from homeassistant.data_entry_flow import RESULT_TYPE_CREATE_ENTRY, RESULT_TYPE_FORM
 
-from custom_components.xiaomi_viomi.config_flow import (CannotConnect,
-                                                        InvalidAuth)
+from custom_components.xiaomi_viomi.config_flow import CannotConnect, InvalidAuth
 from custom_components.xiaomi_viomi.const import DOMAIN
 
 
