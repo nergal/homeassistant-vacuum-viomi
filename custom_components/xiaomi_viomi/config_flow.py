@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 import voluptuous as vol
 from construct.core import ChecksumError
 from homeassistant import config_entries
-from homeassistant.const import CONF_HOST, CONF_TOKEN
+from homeassistant.const import CONF_HOST, CONF_MAC, CONF_NAME, CONF_TOKEN
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import ConfigEntryAuthFailed, HomeAssistantError
@@ -14,7 +14,7 @@ from miio import DeviceException
 from miio.device import DeviceInfo
 from miio.integrations.vacuum.viomi.viomivacuum import ViomiVacuum
 
-from .const import CONF_MAC, CONF_MODEL, DOMAIN
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -79,7 +79,7 @@ async def validate_input(hass: HomeAssistant, data: Dict[str, Any]) -> Dict[str,
     return {
         CONF_HOST: data[CONF_HOST],
         CONF_TOKEN: data[CONF_TOKEN],
-        CONF_MODEL: hub.device_info.model,
+        CONF_NAME: hub.device_info.model,
         CONF_MAC: format_mac(hub.device_info.mac_address),
     }
 
@@ -121,7 +121,7 @@ class XiaomiViomiFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type:
                 await self.hass.config_entries.async_reload(existing_entry.entry_id)
                 return self.async_abort(reason="already_configured")
 
-            return self.async_create_entry(title=info[CONF_MODEL], data=info)
+            return self.async_create_entry(title=info[CONF_NAME], data=info)
 
         return self.async_show_form(
             step_id="user", data_schema=DEVICE_CONFIG, errors=errors

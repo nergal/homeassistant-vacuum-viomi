@@ -1,9 +1,6 @@
 """Constants for Xiaomi Viomi integration."""
 
 DOMAIN = "xiaomi_viomi"
-CONF_DEVICE = "device"
-CONF_MODEL = "model"
-CONF_MAC = "mac"
 CONF_FLOW_TYPE = "config_flow_device"
 
 MODELS_VACUUM = ["viomi.vacuum.v8"]

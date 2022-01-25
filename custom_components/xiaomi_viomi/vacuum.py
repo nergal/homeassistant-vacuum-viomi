@@ -22,6 +22,8 @@ from homeassistant.components.vacuum import (
 from homeassistant.components.xiaomi_miio.device import XiaomiMiioEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_TOKEN, STATE_OFF, STATE_ON
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from miio import DeviceException
 from miio.integrations.vacuum.viomi.viomivacuum import (
     ViomiVacuum,
@@ -67,15 +69,21 @@ STATE_CODE_TO_STATE = {
 }
 
 ERRORS_FALSE_POSITIVE = (
-    0,  # Sleeping and not charging
+    0,  # Sleeping and not charging,
+    514,  # ? Stuck
     2103,  # Charging
     2104,  # ? Returning
     2105,  # Fully charged
+    2108,  # ? Stuck
     2110,  # ? Cleaning
 )
 
 
-async def async_setup_entry(hass, config_entry: ConfigEntry, async_add_entities):
+async def async_setup_platform(
+    _hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+) -> None:
     """Set up the Xiaomi Viomi vacuum cleaner robot from a config entry."""
     entities = []
 
@@ -92,6 +100,15 @@ async def async_setup_entry(hass, config_entry: ConfigEntry, async_add_entities)
     entities.append(viomi)
 
     async_add_entities(entities, update_before_add=True)
+
+
+async def async_setup_entry(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+) -> None:
+    """Set up the Xiaomi Viomi config entry."""
+    await async_setup_platform(hass, config_entry, async_add_entities)
 
 
 class ViomiVacuumIntegration(XiaomiMiioEntity, StateVacuumEntity):

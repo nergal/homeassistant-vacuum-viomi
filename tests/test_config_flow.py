@@ -49,7 +49,7 @@ async def test_form(hass: HomeAssistant) -> None:
 
     result_data = {
         "host": "1.1.1.1",
-        "model": "Name of the device",
+        "name": "Name of the device",
         "token": "ffffffffffffffffffffffffffffffff",
         "mac": "f2:ff:ff:ff:ff:ff",
     }
