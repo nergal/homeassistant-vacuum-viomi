@@ -1,107 +1,105 @@
 """Xiaomi Viomi integration."""
 import logging
 from functools import partial
+from typing import Optional
 
 from homeassistant.components.vacuum import (
     ATTR_CLEANED_AREA,
-    STATE_CLEANING,
-    STATE_DOCKED,
+    DOMAIN,
     STATE_ERROR,
-    STATE_IDLE,
-    STATE_RETURNING,
-    SUPPORT_BATTERY,
-    SUPPORT_FAN_SPEED,
-    SUPPORT_PAUSE,
-    SUPPORT_RETURN_HOME,
-    SUPPORT_SEND_COMMAND,
-    SUPPORT_START,
-    SUPPORT_STATE,
-    SUPPORT_STOP,
     StateVacuumEntity,
 )
 from homeassistant.components.xiaomi_miio.device import XiaomiMiioEntity
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_HOST, CONF_TOKEN, STATE_OFF, STATE_ON
+from homeassistant.config_entries import SOURCE_USER, ConfigEntry
+from homeassistant.const import CONF_HOST, CONF_NAME, CONF_TOKEN, STATE_OFF, STATE_ON
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from miio import DeviceException
+from miio.click_common import command
 from miio.integrations.vacuum.viomi.viomivacuum import (
     ViomiVacuum,
     ViomiVacuumSpeed,
     ViomiVacuumStatus,
 )
 
-from .const import DEVICE_PROPERTIES
+from .config_flow import validate_input
+from .const import (
+    ATTR_CLEANING_TIME,
+    ATTR_DO_NOT_DISTURB,
+    ATTR_DO_NOT_DISTURB_END,
+    ATTR_DO_NOT_DISTURB_START,
+    ATTR_ERROR,
+    ATTR_FILTER_LEFT,
+    ATTR_MAIN_BRUSH_LEFT,
+    ATTR_MOP_ATTACHED,
+    ATTR_MOP_LEFT,
+    ATTR_SIDE_BRUSH_LEFT,
+    ATTR_STATUS,
+    DEVICE_PROPERTIES,
+    ERRORS_FALSE_POSITIVE,
+    STATE_CODE_TO_STATE,
+    SUPPORT_VIOMI,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
-ATTR_CLEANING_TIME = "cleaning_time"
-ATTR_DO_NOT_DISTURB = "do_not_disturb"
-ATTR_DO_NOT_DISTURB_START = "do_not_disturb_start"
-ATTR_DO_NOT_DISTURB_END = "do_not_disturb_end"
-ATTR_MAIN_BRUSH_LEFT = "main_brush_left"
-ATTR_SIDE_BRUSH_LEFT = "side_brush_left"
-ATTR_FILTER_LEFT = "filter_left"
-ATTR_MOP_LEFT = "mop_left"
-ATTR_ERROR = "error"
-ATTR_STATUS = "status"
-ATTR_MOP_ATTACHED = "mop_attached"
 
-SUPPORT_VIOMI = (
-    SUPPORT_STATE
-    | SUPPORT_PAUSE
-    | SUPPORT_STOP
-    | SUPPORT_RETURN_HOME
-    | SUPPORT_FAN_SPEED
-    | SUPPORT_SEND_COMMAND
-    | SUPPORT_BATTERY
-    | SUPPORT_START
-)
-
-STATE_CODE_TO_STATE = {
-    0: STATE_IDLE,  # IdleNotDocked
-    1: STATE_IDLE,  # Idle
-    2: STATE_IDLE,  # Idle2
-    3: STATE_CLEANING,  # Cleaning
-    4: STATE_RETURNING,  # Returning
-    5: STATE_DOCKED,  # Docked
-    6: STATE_CLEANING,  # VacuumingAndMopping
-}
-
-ERRORS_FALSE_POSITIVE = (
-    0,  # Sleeping and not charging
-    2103,  # Charging
-    2104,  # ? Returning
-    2105,  # Fully charged
-    2110,  # ? Cleaning
-)
-
-
-async def async_setup_entry(hass, config_entry: ConfigEntry, async_add_entities):
+async def async_setup_platform(
+    hass: HomeAssistant,
+    raw_config: ConfigType,
+    async_add_entities: AddEntitiesCallback,
+    discovery_info: Optional[DiscoveryInfoType] = None,
+) -> None:
     """Set up the Xiaomi Viomi vacuum cleaner robot from a config entry."""
-    entities = []
 
+    config = await validate_input(hass, raw_config)
+    entry = ConfigEntry(
+        domain=DOMAIN,
+        data=config,
+        version=2,
+        title=config[CONF_NAME],
+        source=SOURCE_USER,
+    )
+    await async_setup_entry(hass, entry, async_add_entities)
+
+
+async def async_setup_entry(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+) -> None:
+    """Set up the Xiaomi Viomi config entry."""
     host = config_entry.data[CONF_HOST]
     token = config_entry.data[CONF_TOKEN]
-    name = config_entry.title
+    name = config_entry.data[CONF_NAME]
     unique_id = config_entry.unique_id
 
     # Create handler
     _LOGGER.debug("Initializing viomi with host %s (token %s...)", host, token[:5])
-    vacuum = ViomiVacuum(host, token)
+    vacuum = PatchedViomiVacuum(ip=host, token=token)
 
     viomi = ViomiVacuumIntegration(name, vacuum, config_entry, unique_id)
-    entities.append(viomi)
+    async_add_entities([viomi], update_before_add=True)
 
-    async_add_entities(entities, update_before_add=True)
+
+class PatchedViomiVacuum(ViomiVacuum):
+    @command()
+    def locate(self):
+        """Locate a device."""
+        self.send("set_resetpos", [1])
 
 
 class ViomiVacuumIntegration(XiaomiMiioEntity, StateVacuumEntity):
     """Xiaomi Viomi integration handler."""
 
+    _device: PatchedViomiVacuum
+
     def __init__(self, name, device, entry, unique_id):
         """Initialize the Xiaomi vacuum cleaner robot handler."""
         super().__init__(name, device, entry, unique_id)
 
-        self.vacuum_state = None
+        self.vacuum_state: Optional[ViomiVacuumStatus] = None
         self._available = False
 
         self.consumable_state = None
@@ -110,7 +108,7 @@ class ViomiVacuumIntegration(XiaomiMiioEntity, StateVacuumEntity):
         self._fan_speeds_reverse = None
 
     @property
-    def state(self):
+    def state(self) -> Optional[str]:
         """Return the status of the vacuum cleaner."""
         if self.vacuum_state is not None:
             # The vacuum reverts back to an idle state after erroring out.
@@ -131,7 +129,8 @@ class ViomiVacuumIntegration(XiaomiMiioEntity, StateVacuumEntity):
                     self.vacuum_state.state,
                     self.vacuum_state.state.value,
                 )
-                return None
+
+        return None
 
     @property
     def battery_level(self):
@@ -189,7 +188,7 @@ class ViomiVacuumIntegration(XiaomiMiioEntity, StateVacuumEntity):
                     ATTR_FILTER_LEFT: int(
                         self.consumable_state.filter_left.total_seconds() / 3600
                     ),
-                    ATTR_STATUS: str(self._get_status()),
+                    ATTR_STATUS: self.state,
                     ATTR_MOP_ATTACHED: self.vacuum_state.mop_installed,
                 }
             )
@@ -204,18 +203,15 @@ class ViomiVacuumIntegration(XiaomiMiioEntity, StateVacuumEntity):
         return self._available
 
     @property
-    def supported_features(self):
+    def supported_features(self) -> int:
         """Flag vacuum cleaner robot features that are supported."""
         return SUPPORT_VIOMI
 
-    def _got_error(self):
-        error_code = self.vacuum_state.error_code
-        return error_code and error_code not in ERRORS_FALSE_POSITIVE
+    def _got_error(self) -> bool:
+        error_code = self.vacuum_state.error_code if self.vacuum_state else None
+        return bool(error_code and error_code not in ERRORS_FALSE_POSITIVE)
 
-    def _get_status(self):
-        return STATE_CODE_TO_STATE[int(self.vacuum_state.state.value)]
-
-    def _get_device_status(self):
+    def _get_device_status(self) -> ViomiVacuumStatus:
         """Override of miio's device.status() because of bug."""
         result = {}
         for prop in DEVICE_PROPERTIES:
@@ -251,6 +247,18 @@ class ViomiVacuumIntegration(XiaomiMiioEntity, StateVacuumEntity):
             _LOGGER.error(mask_error, exc)
             return False
 
+    async def async_turn_on(self, **kwargs):
+        """Start or resume the cleaning task."""
+        await self.async_start()
+
+    async def async_turn_off(self, **kwargs):
+        """Stop the cleaning task."""
+        await self.async_stop()
+
+    async def async_toggle(self, **kwargs):
+        """Start or pause depending on current state."""
+        await self.async_start_pause()
+
     async def async_start(self):
         """Start or resume the cleaning task."""
         await self._try_command("Unable to start the vacuum: %s", self._device.start)
@@ -259,9 +267,24 @@ class ViomiVacuumIntegration(XiaomiMiioEntity, StateVacuumEntity):
         """Pause the cleaning task."""
         await self._try_command("Unable to set start/pause: %s", self._device.pause)
 
+    async def async_start_pause(self):
+        """Start or pause depending on current state."""
+        if self.vacuum_state.is_on:
+            await self.async_pause()
+        else:
+            await self.async_start()
+
     async def async_stop(self, **kwargs):
         """Stop the vacuum cleaner."""
         await self._try_command("Unable to stop: %s", self._device.stop)
+
+    async def async_locate(self, **kwargs):
+        """Locate the vacuum cleaner."""
+        await self._try_command("Unable to locate: %s", self._device.locate)
+
+    async def async_clean_spot(self, **kwargs):
+        """Suppress NotImplementedError for clean spot capability."""
+        pass
 
     async def async_set_fan_speed(self, fan_speed, **kwargs):
         """Set fan speed."""

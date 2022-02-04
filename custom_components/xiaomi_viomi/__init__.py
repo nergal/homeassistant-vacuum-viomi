@@ -1,10 +1,24 @@
 """Xiaomi Viomi integration."""
 import asyncio
 
+import voluptuous as vol
+from homeassistant.components.vacuum import PLATFORM_SCHEMA
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_HOST, CONF_NAME, CONF_TOKEN, DEVICE_DEFAULT_NAME
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_validation as cv
+
+from .const import DOMAIN  # noqa: F401
 
 PLATFORMS = ["vacuum"]
+
+PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
+    {
+        vol.Optional(CONF_NAME, default=DEVICE_DEFAULT_NAME): cv.string,
+        vol.Required(CONF_TOKEN): cv.string,
+        vol.Required(CONF_HOST): cv.string,
+    }
+)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "homeassistant-vacuum-viomi"
-version = "0.0.3"
+version = "0.0.4"
 description = "Integration of a Xiaomi Viomi vacuum devices"
 authors = ["Artem Poliukhovych <me@2mio.com>"]
 license = "MIT"

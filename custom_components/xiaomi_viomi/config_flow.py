@@ -5,7 +5,15 @@ from typing import Any, Dict, Optional
 import voluptuous as vol
 from construct.core import ChecksumError
 from homeassistant import config_entries
-from homeassistant.const import CONF_HOST, CONF_TOKEN
+from homeassistant.components.xiaomi_miio import CONF_MODEL
+from homeassistant.const import (
+    CONF_HOST,
+    CONF_MAC,
+    CONF_NAME,
+    CONF_PLATFORM,
+    CONF_TOKEN,
+    DEVICE_DEFAULT_NAME,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import ConfigEntryAuthFailed, HomeAssistantError
@@ -14,7 +22,7 @@ from miio import DeviceException
 from miio.device import DeviceInfo
 from miio.integrations.vacuum.viomi.viomivacuum import ViomiVacuum
 
-from .const import CONF_MAC, CONF_MODEL, DOMAIN
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -22,6 +30,7 @@ DEVICE_CONFIG = vol.Schema(
     {
         vol.Required(CONF_HOST): str,
         vol.Required(CONF_TOKEN): vol.All(str, vol.Length(min=32, max=32)),
+        vol.Optional(CONF_NAME, default=DEVICE_DEFAULT_NAME): str,
     }
 )
 
@@ -76,10 +85,15 @@ async def validate_input(hass: HomeAssistant, data: Dict[str, Any]) -> Dict[str,
     if not await hub.async_device_is_connectable(data[CONF_HOST], data[CONF_TOKEN]):
         raise InvalidAuth
 
+    DEVICE_CONFIG.extend({vol.Optional(CONF_PLATFORM): str})(data)
+
+    name = data[CONF_NAME] if CONF_NAME in data else hub.device_info.model
+
     return {
         CONF_HOST: data[CONF_HOST],
         CONF_TOKEN: data[CONF_TOKEN],
         CONF_MODEL: hub.device_info.model,
+        CONF_NAME: name,
         CONF_MAC: format_mac(hub.device_info.mac_address),
     }
 
@@ -116,12 +130,13 @@ class XiaomiViomiFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type:
                 data = existing_entry.data.copy()
                 data[CONF_HOST] = info[CONF_HOST]
                 data[CONF_TOKEN] = info[CONF_TOKEN]
+                data[CONF_NAME] = info[CONF_NAME]
 
                 self.hass.config_entries.async_update_entry(existing_entry, data=data)
                 await self.hass.config_entries.async_reload(existing_entry.entry_id)
                 return self.async_abort(reason="already_configured")
 
-            return self.async_create_entry(title=info[CONF_MODEL], data=info)
+            return self.async_create_entry(title=info[CONF_NAME], data=info)
 
         return self.async_show_form(
             step_id="user", data_schema=DEVICE_CONFIG, errors=errors
