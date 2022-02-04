@@ -27,3 +27,6 @@ test:
 
 coverage:
 	$(POETRY) run pytest --cov-report xml --cov=custom_components.xiaomi_viomi $(TEST_FOLDER)
+
+coverage-html:
+	$(POETRY) run pytest --cov-report html --cov=custom_components.xiaomi_viomi $(TEST_FOLDER)

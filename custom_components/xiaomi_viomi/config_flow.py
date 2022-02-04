@@ -130,7 +130,8 @@ class XiaomiViomiFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):  # type:
                 data = existing_entry.data.copy()
                 data[CONF_HOST] = info[CONF_HOST]
                 data[CONF_TOKEN] = info[CONF_TOKEN]
-                data[CONF_NAME] = info[CONF_NAME]
+                data[CONF_NAME] = info[CONF_NAME] or existing_entry.title
+                data[CONF_MODEL] = info[CONF_MODEL]
 
                 self.hass.config_entries.async_update_entry(existing_entry, data=data)
                 await self.hass.config_entries.async_reload(existing_entry.entry_id)

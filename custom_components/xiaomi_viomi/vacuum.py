@@ -3,12 +3,10 @@ import logging
 from functools import partial
 from typing import Optional
 
-from homeassistant.components.vacuum import (
-    ATTR_CLEANED_AREA,
-    DOMAIN,
-    STATE_ERROR,
-    StateVacuumEntity,
-)
+from homeassistant.components.vacuum import ATTR_CLEANED_AREA
+from homeassistant.components.vacuum import DOMAIN as PLATFORM_NAME
+from homeassistant.components.vacuum import STATE_ERROR, StateVacuumEntity
+from homeassistant.components.xiaomi_miio import CONF_MODEL
 from homeassistant.components.xiaomi_miio.device import XiaomiMiioEntity
 from homeassistant.config_entries import SOURCE_USER, ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_TOKEN, STATE_OFF, STATE_ON
@@ -55,7 +53,7 @@ async def async_setup_platform(
 
     config = await validate_input(hass, raw_config)
     entry = ConfigEntry(
-        domain=DOMAIN,
+        domain=PLATFORM_NAME,
         data=config,
         version=2,
         title=config[CONF_NAME],
@@ -70,9 +68,18 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the Xiaomi Viomi config entry."""
-    host = config_entry.data[CONF_HOST]
-    token = config_entry.data[CONF_TOKEN]
-    name = config_entry.data[CONF_NAME]
+
+    if CONF_MODEL not in config_entry.data:
+        data = config_entry.data.copy()
+        data[CONF_NAME] = config_entry.title
+        data[CONF_MODEL] = config_entry.title
+
+        hass.config_entries.async_update_entry(config_entry, data=data)
+
+    host = config_entry.data.get(CONF_HOST)
+    token = config_entry.data.get(CONF_TOKEN)
+    name = config_entry.data.get(CONF_NAME, config_entry.title)
+
     unique_id = config_entry.unique_id
 
     # Create handler

@@ -25,12 +25,10 @@ from tests import get_entity_id, get_mocked_entry, mocked_viomi_device
 
 async def test_vacuum_state(hass: HomeAssistant):
     entry = get_mocked_entry()
-    with mocked_viomi_device() as mock_device_send:
+    with mocked_viomi_device():
         entry.add_to_hass(hass)
         await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
-
-        mock_device_send.reset_mock()
 
         entity_id = get_entity_id()
         state = hass.states.get(entity_id)
@@ -178,12 +176,10 @@ async def test_vacuum_fan_speed_service(
 )
 async def test_vacuum_regular_state(hass: HomeAssistant, state_code, state_value):
     entry = get_mocked_entry()
-    with mocked_viomi_device({"run_state": state_code}) as mock_device_send:
+    with mocked_viomi_device({"run_state": state_code}):
         entry.add_to_hass(hass)
         await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
-
-        mock_device_send.reset_mock()
 
         entity_id = get_entity_id()
         state = hass.states.get(entity_id)
@@ -201,12 +197,10 @@ async def test_vacuum_regular_state(hass: HomeAssistant, state_code, state_value
 )
 async def test_vacuum_error_state(hass: HomeAssistant, error_code, error_value):
     entry = get_mocked_entry()
-    with mocked_viomi_device({"err_state": error_code}) as mock_device_send:
+    with mocked_viomi_device({"err_state": error_code}):
         entry.add_to_hass(hass)
         await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
-
-        mock_device_send.reset_mock()
 
         entity_id = get_entity_id()
         state = hass.states.get(entity_id)
