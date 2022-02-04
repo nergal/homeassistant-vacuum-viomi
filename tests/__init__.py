@@ -21,7 +21,6 @@ MOCKED_DEVICE_STATE = {
     "err_state": 2105,
     "has_map": 1,
     "has_newmap": 1,
-    "hw_info": "1.0.3",
     "is_charge": 0,
     "is_mop": 0,
     "is_work": 1,
@@ -36,7 +35,6 @@ MOCKED_DEVICE_STATE = {
     "s_time": 20,
     "start_time": 0,
     "suction_grade": 0,
-    "sw_info": "3.5.3_0017",
     "v_state": 10,
     "water_grade": 12,
     "zone_data": "0",
@@ -48,8 +46,8 @@ MOCKED_DEVICE_INFO = {
 }
 
 
-def get_entity_id() -> str:
-    return DOMAIN + "." + TEST_NAME
+def get_entity_id(use_model=False) -> str:
+    return DOMAIN + "." + (TEST_MODEL.replace(".", "_") if use_model else TEST_NAME)
 
 
 def get_mocked_entry():
@@ -66,13 +64,17 @@ def get_mocked_entry():
     )
 
 
-def mocked_viomi_device():
+def mocked_viomi_device(device_state_adjustment=None):
+    state = MOCKED_DEVICE_STATE
+    if device_state_adjustment is not None:
+        state = {**MOCKED_DEVICE_STATE, **device_state_adjustment}
+
     def _device_mock_method(command: str, parameters: Any = None):
         # Request for getting device state
         if command == "get_prop" and parameters:
             property_name = parameters[0]
-            if property_name in MOCKED_DEVICE_STATE:
-                return [MOCKED_DEVICE_STATE[property_name]]
+            if property_name in state:
+                return [state[property_name]]
 
             return [None]
         # Request for getting state of consumables

@@ -21,7 +21,6 @@ async def test_platform_setup(hass: HomeAssistant):
                 "host": TEST_HOST,
                 "token": TEST_TOKEN,
                 "name": TEST_NAME,
-                "model": TEST_MODEL,
             }
         ]
     }
@@ -38,3 +37,30 @@ async def test_platform_setup(hass: HomeAssistant):
 
         assert state
         assert state.state == STATE_DOCKED
+        assert state.name == TEST_NAME
+
+
+async def test_platform_setup_without_name(hass: HomeAssistant):
+    config = {
+        DOMAIN: [
+            {
+                "platform": PLATFORM_NAME,
+                "host": TEST_HOST,
+                "token": TEST_TOKEN,
+            }
+        ]
+    }
+
+    with mocked_viomi_device() as mock_device_send:
+        await async_setup_component(hass, DOMAIN, config)
+
+        await hass.async_block_till_done()
+
+        mock_device_send.reset_mock()
+
+        entity_id = get_entity_id(True)
+        state = hass.states.get(entity_id)
+
+        assert state
+        assert state.state == STATE_DOCKED
+        assert state.name == TEST_MODEL

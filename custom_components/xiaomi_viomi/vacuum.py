@@ -58,7 +58,7 @@ async def async_setup_platform(
         domain=DOMAIN,
         data=config,
         version=2,
-        title=raw_config[CONF_NAME],
+        title=config[CONF_NAME],
         source=SOURCE_USER,
     )
     await async_setup_entry(hass, entry, async_add_entities)
@@ -188,7 +188,7 @@ class ViomiVacuumIntegration(XiaomiMiioEntity, StateVacuumEntity):
                     ATTR_FILTER_LEFT: int(
                         self.consumable_state.filter_left.total_seconds() / 3600
                     ),
-                    ATTR_STATUS: str(self._get_status()),
+                    ATTR_STATUS: self.state,
                     ATTR_MOP_ATTACHED: self.vacuum_state.mop_installed,
                 }
             )
@@ -210,10 +210,6 @@ class ViomiVacuumIntegration(XiaomiMiioEntity, StateVacuumEntity):
     def _got_error(self) -> bool:
         error_code = self.vacuum_state.error_code if self.vacuum_state else None
         return bool(error_code and error_code not in ERRORS_FALSE_POSITIVE)
-
-    def _get_status(self) -> str:
-        state_value = self.vacuum_state.state.value if self.vacuum_state else None
-        return STATE_CODE_TO_STATE[int(state_value)]
 
     def _get_device_status(self) -> ViomiVacuumStatus:
         """Override of miio's device.status() because of bug."""

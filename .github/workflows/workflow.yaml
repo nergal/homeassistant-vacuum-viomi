@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.8, 3.9]
+        python-version: [3.8, 3.9, 3.10]
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
@@ -30,7 +30,9 @@ jobs:
       - name: Run lint checks
         run: make lint
       - name: Run unit tests
-        run: make test
+        run: make coverage
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v1
 
   analyze:
     name: Analyze CodeQL
