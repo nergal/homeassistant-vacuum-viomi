@@ -8,6 +8,7 @@ from homeassistant.data_entry_flow import RESULT_TYPE_CREATE_ENTRY, RESULT_TYPE_
 
 from custom_components.xiaomi_viomi.config_flow import CannotConnect, InvalidAuth
 from custom_components.xiaomi_viomi.const import DOMAIN
+from tests import TEST_HOST, TEST_MAC, TEST_MODEL, TEST_NAME, TEST_TOKEN
 
 
 async def test_form(hass: HomeAssistant) -> None:
@@ -20,10 +21,7 @@ async def test_form(hass: HomeAssistant) -> None:
     assert result["type"] == RESULT_TYPE_FORM
     assert result["errors"] is None
 
-    device_info_mock = {
-        "model": "Name of the device",
-        "mac_address": "F2:FF:FF:FF:FF:FF",
-    }
+    device_info_mock = {"mac_address": TEST_MAC, "model": TEST_MODEL}
 
     with patch(
         "custom_components.xiaomi_viomi.config_flow.ViomiDeviceHub.async_device_is_connectable",
@@ -41,21 +39,24 @@ async def test_form(hass: HomeAssistant) -> None:
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {
-                "host": "1.1.1.1",
-                "token": "ffffffffffffffffffffffffffffffff",
+                "host": TEST_HOST,
+                "token": TEST_TOKEN,
+                "model": TEST_MODEL,
+                "name": TEST_NAME,
             },
         )
         await hass.async_block_till_done()
 
     result_data = {
-        "host": "1.1.1.1",
-        "name": "Name of the device",
-        "token": "ffffffffffffffffffffffffffffffff",
-        "mac": "f2:ff:ff:ff:ff:ff",
+        "host": TEST_HOST,
+        "name": TEST_NAME,
+        "token": TEST_TOKEN,
+        "model": TEST_MODEL,
+        "mac": TEST_MAC,
     }
 
     assert result2["type"] == RESULT_TYPE_CREATE_ENTRY
-    assert result2["title"] == "Name of the device"
+    assert result2["title"] == TEST_NAME
     assert result2["data"] == result_data
     assert len(mock_setup_entry.mock_calls) == 1
 
@@ -73,8 +74,10 @@ async def test_form_invalid_auth(hass: HomeAssistant) -> None:
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {
-                "host": "1.1.1.1",
-                "token": "ffffffffffffffffffffffffffffffff",
+                "host": TEST_HOST,
+                "token": TEST_TOKEN,
+                "model": TEST_MODEL,
+                "name": TEST_NAME,
             },
         )
 
@@ -95,8 +98,10 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
         result2 = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {
-                "host": "1.1.1.1",
-                "token": "ffffffffffffffffffffffffffffffff",
+                "host": TEST_HOST,
+                "token": TEST_TOKEN,
+                "model": TEST_MODEL,
+                "name": TEST_NAME,
             },
         )
 

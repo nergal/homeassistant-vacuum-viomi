@@ -5,6 +5,7 @@ from typing import Any, Dict, Optional
 import voluptuous as vol
 from construct.core import ChecksumError
 from homeassistant import config_entries
+from homeassistant.components.xiaomi_miio import CONF_MODEL
 from homeassistant.const import CONF_HOST, CONF_MAC, CONF_NAME, CONF_TOKEN
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
@@ -12,7 +13,7 @@ from homeassistant.exceptions import ConfigEntryAuthFailed, HomeAssistantError
 from homeassistant.helpers.device_registry import format_mac
 from miio import DeviceException
 from miio.device import DeviceInfo
-from miio.integrations.vacuum.viomi.viomivacuum import ViomiVacuum
+from miio.integrations.vacuum.viomi.viomivacuum import SUPPORTED_MODELS, ViomiVacuum
 
 from .const import DOMAIN
 
@@ -21,7 +22,9 @@ _LOGGER = logging.getLogger(__name__)
 DEVICE_CONFIG = vol.Schema(
     {
         vol.Required(CONF_HOST): str,
+        vol.Required(CONF_NAME): str,
         vol.Required(CONF_TOKEN): vol.All(str, vol.Length(min=32, max=32)),
+        vol.Required(CONF_MODEL): vol.In(SUPPORTED_MODELS),
     }
 )
 
@@ -79,7 +82,8 @@ async def validate_input(hass: HomeAssistant, data: Dict[str, Any]) -> Dict[str,
     return {
         CONF_HOST: data[CONF_HOST],
         CONF_TOKEN: data[CONF_TOKEN],
-        CONF_NAME: hub.device_info.model,
+        CONF_MODEL: hub.device_info.model,
+        CONF_NAME: data[CONF_NAME],
         CONF_MAC: format_mac(hub.device_info.mac_address),
     }
 

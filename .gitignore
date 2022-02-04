@@ -3,5 +3,7 @@
 .vscode/
 __pycache__/
 .idea/
+.coverage
+.DS_Store
 *.tmp
 *.log
