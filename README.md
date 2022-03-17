@@ -1,5 +1,7 @@
 # Homeassistant Vacuum Viomi integration for HACS
 
+[![Support Ukraine](https://img.shields.io/badge/Support%20Ukraine-Now-%23FFD500?labelColor=005BBB)](https://github.com/support-ukraine/support-ukraine)
+
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
 [![codecov](https://codecov.io/gh/nergal/homeassistant-vacuum-viomi/branch/master/graph/badge.svg?token=MUHLPCJY2G)](https://codecov.io/gh/nergal/homeassistant-vacuum-viomi)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
