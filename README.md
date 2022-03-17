@@ -1,6 +1,6 @@
 # Homeassistant Vacuum Viomi integration for HACS
 
-[![Support Ukraine](https://img.shields.io/badge/Support%20Ukraine-Now-%23FFD500?labelColor=005BBB)](https://github.com/support-ukraine/support-ukraine)
+[![SWUbanner](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg)](https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md)
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
 [![codecov](https://codecov.io/gh/nergal/homeassistant-vacuum-viomi/branch/master/graph/badge.svg?token=MUHLPCJY2G)](https://codecov.io/gh/nergal/homeassistant-vacuum-viomi)
@@ -44,4 +44,7 @@ or any of its subsidiaries or its affiliates. The official Xiaomi website can be
 ## License
 This project is under the MIT license.
 
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/nalecz)
+## Additional information for users from Russia and Belarus
+* Russia has [illegally annexed Crimea in 2014](https://en.wikipedia.org/wiki/Annexation_of_Crimea_by_the_Russian_Federation) and [brought the war in Donbas](https://en.wikipedia.org/wiki/War_in_Donbas) followed by [full-scale invasion of Ukraine in 2022](https://en.wikipedia.org/wiki/2022_Russian_invasion_of_Ukraine).
+* Russia has brought sorrow and devastations to millions of Ukrainians, killed hundreds of innocent people, damaged thousands of buildings, and forced several million people to flee.
+* [Putin khuylo!](https://en.wikipedia.org/wiki/Putin_khuylo!)
